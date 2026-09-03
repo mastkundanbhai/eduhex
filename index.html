@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduHex Quiz (Grades 1-10)</title>
+  
+  <!-- Google Fonts: Fredoka & Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            saffron: '#ff9933',
+            'saffron-dark': '#e67e17',
+            duogreen: '#58cc02',
+            'duogreen-dark': '#46a302',
+            duoblue: '#1cb0f6',
+            'duoblue-dark': '#1899d6',
+            duoyellow: '#ffc800',
+            duopurple: '#af64f0',
+            duored: '#ff4b4b'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom 3D Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Google Translate Element Widget -->
+  <div id="google_translate_element" style="display:none;"></div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,mr,gu,ta,te,bn,kn,pa,ur',
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 select-none flex flex-col min-h-screen">
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Top App Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-white border-b-2 border-slate-200 px-3 py-2.5 sm:px-8 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+      
+      <!-- Brand Logo & Hacker Bhau Badge -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.app && window.app.returnToDashboard()">
+          <!-- Hexagon Icon -->
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-amber-500 flex items-center justify-center text-white shadow-md text-xl font-black">
+            ⬡
+          </div>
+          <div>
+            <div class="text-xl sm:text-2xl font-black tracking-tight text-slate-800 flex items-center gap-1">
+              Edu<span class="text-amber-500">Hex</span>
+            </div>
+            <div class="text-[10px] font-bold text-emerald-600 -mt-1 tracking-wider uppercase">Class 1 to 10 · India</div>
+          </div>
+        </div>
+
+        <!-- Made by Hacker Bhau Tag -->
+        <div class="hidden md:flex items-center gap-1.5 bg-gradient-to-r from-amber-50 via-orange-50 to-indigo-50 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-black text-slate-800 shadow-xs">
+          <span>⚡ Made by</span>
+          <span class="text-indigo-600 font-black">Hacker Bhau</span>
+        </div>
+      </div>
+
+      <!-- Live Gamification Stats & Language Translation on Right Corner -->
+      <div class="flex items-center gap-1.5 sm:gap-3">
+        
+        <!-- Daily Streak -->
+        <div class="flex items-center gap-1 bg-orange-50 border-2 border-orange-200 rounded-2xl px-2 sm:px-2.5 py-1 sm:py-1.5 text-orange-600 font-extrabold text-xs sm:text-sm" title="Daily Streak">
+          <span class="flame-icon text-base sm:text-lg">🔥</span>
+          <span id="header-streak">1</span>
+        </div>
+
+        <!-- Total XP -->
+        <div class="flex items-center gap-1 bg-amber-50 border-2 border-amber-200 rounded-2xl px-2 sm:px-2.5 py-1 sm:py-1.5 text-amber-600 font-extrabold text-xs sm:text-sm" title="Total XP Earned">
+          <span class="text-sm sm:text-base">⚡</span>
+          <span id="header-xp">0 XP</span>
+        </div>
+
+        <!-- Hearts / Practice Mode -->
+        <div class="flex items-center gap-1 bg-rose-50 border-2 border-rose-200 rounded-2xl px-2 sm:px-2.5 py-1 sm:py-1.5 font-extrabold text-xs sm:text-sm" title="Lives Remaining">
+          <span id="header-hearts"><span class="text-rose-500">❤️ 5</span></span>
+        </div>
+
+        <!-- Sound Toggle -->
+        <button id="sound-toggle-btn" class="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 border-2 border-slate-200 rounded-2xl px-2 sm:px-2.5 py-1 sm:py-1.5 transition-colors" title="Toggle Sound">
+          <span class="text-base sm:text-lg">🔊</span>
+        </button>
+
+        <!-- Mascot Companion Switcher -->
+        <button id="mascot-select-btn" class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 border-2 border-slate-200 rounded-2xl p-1 sm:p-1.5 sm:pr-2.5 transition-colors" title="Choose Mascot">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 mascot-avatar-slot pointer-events-none"></div>
+          <span class="text-xs font-black text-slate-700 hidden lg:inline">Mascot</span>
+        </button>
+
+        <!-- LANGUAGE TRANSLATION BUTTON ON THE RIGHT CORNER -->
+        <div class="relative inline-block text-left" id="lang-menu-wrapper">
+          <button id="lang-btn" onclick="window.app && window.app.toggleLanguageMenu()" class="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border-2 border-amber-300 rounded-2xl px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-black text-amber-900 shadow-sm transition-all" title="Change Language">
+            <span class="text-sm sm:text-base">🌐</span>
+            <span id="current-lang-text" class="hidden sm:inline">English</span>
+            <span class="text-[9px] text-amber-600">▼</span>
+          </button>
+
+          <!-- Language Dropdown Menu -->
+          <div id="lang-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-white border-2 border-slate-200 rounded-2xl shadow-2xl py-2 z-50">
+            <div class="px-3 py-1 text-[10px] font-black uppercase text-slate-400 tracking-wider border-b border-slate-100 mb-1">
+              Translate / भाषा चुनें
+            </div>
+            <button onclick="window.app && window.app.changeLanguage('en')" class="w-full text-left px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-700 flex items-center justify-between">
+              <span>English</span>
+              <span class="text-[10px] text-slate-400">Default</span>
+            </button>
+            <button onclick="window.app && window.app.changeLanguage('hi')" class="w-full text-left px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-700 flex items-center justify-between">
+              <span>हिंदी (Hindi)</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">अनुवाद</span>
+            </button>
+            <button onclick="window.app && window.app.changeLanguage('mr')" class="w-full text-left px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-700 flex items-center justify-between">
+              <span>मराठी (Marathi)</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">अनुवाद</span>
+            </button>
+            <button onclick="window.app && window.app.changeLanguage('gu')" class="w-full text-left px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-700 flex items-center justify-between">
+              <span>ગુજરાતી (Gujarati)</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">અનુવાદ</span>
+            </button>
+            <button onclick="window.app && window.app.changeLanguage('ta')" class="w-full text-left px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-700 flex items-center justify-between">
+              <span>தமிழ் (Tamil)</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">மொழிபெயர்ப்பு</span>
+            </button>
+            <button onclick="window.app && window.app.changeLanguage('te')" class="w-full text-left px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-700 flex items-center justify-between">
+              <span>తెలుగు (Telugu)</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">అనువాదం</span>
+            </button>
+            <button onclick="window.app && window.app.changeLanguage('bn')" class="w-full text-left px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-700 flex items-center justify-between">
+              <span>বাংলা (Bengali)</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">অনুবাদ</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Grade Selector Bar -->
+  <div class="bg-white border-b border-slate-200 px-4 py-2.5 shadow-sm">
+    <div class="max-w-6xl mx-auto flex items-center gap-3">
+      <span class="text-xs font-black text-slate-400 uppercase tracking-wider flex-shrink-0">Select Grade:</span>
+      <div id="grade-bar" class="grade-scroll-bar flex-1">
+        <!-- Grade Pills injected by JS: Class 1 to 10 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 sm:py-8">
+
+    <!-- ======================================================== -->
+    <!-- VIEW 1: DASHBOARD / HOME -->
+    <!-- ======================================================== -->
+    <div id="view-dashboard" class="space-y-8">
+
+      <!-- Hero Mascot Greeting Banner -->
+      <div class="bg-gradient-to-br from-amber-50 via-orange-50 to-emerald-50 rounded-3xl border-2 border-orange-200/80 p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+        <div class="mascot-container flex-shrink-0">
+          <div class="mascot-bubble mb-2">
+            <span id="mascot-bubble-text">Namaste! Ready to explore science, math, and our great country?</span>
+          </div>
+          <div class="mascot-avatar-slot"></div>
+        </div>
+
+        <div class="flex-1 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 bg-amber-200/80 text-amber-900 font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+            <span>🇮🇳 NCERT & Indian Curriculum Aligned</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2 tracking-tight">
+            Welcome to <span class="text-amber-500">EduHex</span> Arena!
+          </h1>
+          <p class="text-slate-600 text-sm sm:text-base font-semibold max-w-xl leading-relaxed">
+            Boost your knowledge with bite-sized multiple choice questions designed for <strong id="selected-grade-display" class="text-slate-900 font-extrabold">Class 6</strong>. Master concepts, build daily streaks, and earn cool badges!
+          </p>
+
+          <!-- Quick Mode Controls -->
+          <div class="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-4">
+            <label class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-300 shadow-sm cursor-pointer text-xs font-bold text-slate-700 hover:bg-slate-50">
+              <input type="checkbox" id="zen-mode-toggle" class="w-4 h-4 text-emerald-600 rounded">
+              <span>Unlimited Hearts (Practice Mode)</span>
+            </label>
+            <button onclick="window.app && window.app.openMascotModal()" class="text-xs font-extrabold text-blue-600 hover:underline">
+              Change Sidekick Mascot ➔
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subject Selection Section -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-black text-slate-800">Choose Your Quest Track</h2>
+          <span class="text-xs font-bold text-slate-500">5 Questions per round · Earn +10 XP each</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          
+          <!-- Science Card -->
+          <div class="category-card card-science" onclick="window.app && window.app.startQuiz('science')">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-2xl mb-4 border border-emerald-300">
+              🔬
+            </div>
+            <h3 class="text-lg font-black text-slate-800 mb-1">Science Explorer</h3>
+            <p class="text-xs font-semibold text-slate-600 leading-relaxed mb-4">
+              Physics, Chemistry, Biology & Environmental Studies for your grade.
+            </p>
+            <button class="btn-duo btn-duo-green w-full text-sm mt-auto">
+              Start Science ➔
+            </button>
+          </div>
+
+          <!-- Mathematics Card -->
+          <div class="category-card card-math" onclick="window.app && window.app.startQuiz('math')">
+            <div class="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center text-2xl mb-4 border border-sky-300">
+              📐
+            </div>
+            <h3 class="text-lg font-black text-slate-800 mb-1">Math Prodigy</h3>
+            <p class="text-xs font-semibold text-slate-600 leading-relaxed mb-4">
+              Arithmetic, Algebra, Geometry, Angles & Calculations step-by-step.
+            </p>
+            <button class="btn-duo btn-duo-blue w-full text-sm mt-auto">
+              Start Math ➔
+            </button>
+          </div>
+
+          <!-- India GK & Current Affairs Card -->
+          <div class="category-card card-gk" onclick="window.app && window.app.startQuiz('gk')">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-2xl mb-4 border border-amber-300">
+              🇮🇳
+            </div>
+            <h3 class="text-lg font-black text-slate-800 mb-1">India GK & Affairs</h3>
+            <p class="text-xs font-semibold text-slate-600 leading-relaxed mb-4">
+              ISRO space missions, Constitution, national symbols, rivers & history.
+            </p>
+            <button class="btn-duo btn-duo-saffron w-full text-sm mt-auto">
+              Start India GK ➔
+            </button>
+          </div>
+
+          <!-- Mega Olympiad Card -->
+          <div class="category-card card-olympiad" onclick="window.app && window.app.startQuiz('olympiad')">
+            <div class="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center text-2xl mb-4 border border-purple-300">
+              🏆
+            </div>
+            <h3 class="text-lg font-black text-slate-800 mb-1">Mega Olympiad</h3>
+            <p class="text-xs font-semibold text-slate-600 leading-relaxed mb-4">
+              All-rounder challenge combining Science, Math & General Studies!
+            </p>
+            <button class="btn-duo btn-duo-purple w-full text-sm mt-auto">
+              Start Olympiad ➔
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Learning Path & Achievements Strip -->
+      <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm">
+        <h3 class="font-black text-slate-800 text-base mb-3 flex items-center gap-2">
+          <span>🏅</span> Your Hall of Badges
+        </h3>
+        <div class="flex flex-wrap gap-3">
+          <div class="badge-pill text-slate-700">
+            <span>🎯</span> First Steps
+          </div>
+          <div class="badge-pill text-amber-700 bg-amber-50 border-amber-200">
+            <span>🔥</span> Fire Starter (Streak 3)
+          </div>
+          <div class="badge-pill text-sky-700 bg-sky-50 border-sky-200">
+            <span>⚡</span> Century Club (100 XP)
+          </div>
+          <div class="badge-pill text-purple-700 bg-purple-50 border-purple-200">
+            <span>🎓</span> Board Scholar (Class 10)
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 2: QUIZ ARENA -->
+    <!-- ======================================================== -->
+    <div id="view-quiz" class="hidden space-y-6 max-w-3xl mx-auto">
+      
+      <!-- Quiz Header & Progress Bar -->
+      <div class="flex items-center gap-4">
+        <button onclick="window.app && window.app.returnToDashboard()" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-black text-lg transition-colors" title="Exit Quiz">
+          ✕
+        </button>
+
+        <div class="flex-1">
+          <div class="duo-progress-track">
+            <div id="quiz-progress-fill" class="duo-progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Lifelines: 50:50 and Hint -->
+        <div class="flex items-center gap-2">
+          <button id="btn-lifeline" class="btn-duo btn-duo-outline !py-1.5 !px-3 text-xs font-black text-purple-700 border-purple-200" title="Eliminate 2 wrong answers">
+            ✂️ 50:50
+          </button>
+          <button id="btn-hint" class="btn-duo btn-duo-outline !py-1.5 !px-3 text-xs font-black text-amber-700 border-amber-200" title="Show Mascot Hint">
+            💡 Hint
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between text-xs font-extrabold text-slate-500">
+        <span id="quiz-topic-title">Science · Class 6</span>
+        <span id="quiz-q-counter">Question 1 of 5</span>
+      </div>
+
+      <!-- Mascot Companion Reaction Bar -->
+      <div class="flex items-end gap-3 justify-center sm:justify-start">
+        <div class="w-20 h-20 mascot-avatar-slot flex-shrink-0"></div>
+        <div class="mascot-bubble max-w-sm mb-4">
+          <span id="mascot-bubble-text">Take your time! Read each option carefully.</span>
+        </div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+        <div class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800" id="question-subject-badge">
+          Science 🔬
+        </div>
+        <h2 id="question-text" class="text-xl sm:text-2xl font-black text-slate-800 leading-snug">
+          Question Loading...
+        </h2>
+      </div>
+
+      <!-- 4 MCQ Options Container -->
+      <div id="options-container" class="grid grid-cols-1 gap-3.5">
+        <!-- Injected dynamically by JS -->
+      </div>
+
+      <!-- Check Answer Action Button -->
+      <div class="pt-4 flex justify-end">
+        <button id="btn-check-answer" onclick="window.app && window.app.checkAnswer()" class="btn-duo btn-duo-green text-lg w-full sm:w-auto min-w-[200px]" disabled>
+          Check Answer
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 3: RESULTS SCREEN -->
+    <!-- ======================================================== -->
+    <div id="view-results" class="hidden max-w-2xl mx-auto space-y-6 text-center py-4">
+      
+      <!-- Celebratory Mascot -->
+      <div class="flex justify-center">
+        <div class="w-32 h-32 mascot-avatar-slot"></div>
+      </div>
+
+      <div>
+        <h2 id="results-title" class="text-3xl font-black text-slate-800 tracking-tight mb-2">
+          Quiz Completed! Shabash!
+        </h2>
+        <p id="results-subtitle" class="text-slate-600 font-bold text-sm sm:text-base">
+          Great job! Keep practicing to stay sharp.
+        </p>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-3 gap-4 max-w-md mx-auto">
+        <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 shadow-sm">
+          <div class="text-xs font-black text-slate-400 uppercase">Score</div>
+          <div id="results-score-value" class="text-2xl font-black text-slate-800 mt-1">4 / 5</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 shadow-sm">
+          <div class="text-xs font-black text-slate-400 uppercase">XP Earned</div>
+          <div id="results-xp-earned" class="text-2xl font-black text-amber-500 mt-1">+40 XP</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 shadow-sm">
+          <div class="text-xs font-black text-slate-400 uppercase">Accuracy</div>
+          <div id="results-accuracy" class="text-2xl font-black text-emerald-600 mt-1">80%</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <button id="btn-retry-mistakes" class="btn-duo btn-duo-saffron w-full sm:w-auto text-base">
+          🔄 Review & Retry Mistakes
+        </button>
+        <button onclick="window.app && window.app.returnToDashboard()" class="btn-duo btn-duo-green w-full sm:w-auto text-base">
+          Back to Dashboard ➔
+        </button>
+      </div>
+
+      <!-- Detailed Review of Answers -->
+      <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-sm text-left mt-8">
+        <h3 class="font-black text-slate-800 text-lg mb-4 flex items-center gap-2">
+          <span>📋</span> Question by Question Review
+        </h3>
+        <div id="results-review-list" class="space-y-3">
+          <!-- Injected dynamically by JS -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- FOOTER: MADE BY HACKER BHAU -->
+  <!-- ======================================================== -->
+  <footer class="mt-auto bg-white border-t-2 border-slate-200 py-6 px-4 shadow-inner">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-amber-500 flex items-center justify-center text-white text-base font-black shadow-sm">
+          ⬡
+        </div>
+        <div class="text-left">
+          <span class="text-base font-black text-slate-800">Edu<span class="text-amber-500">Hex</span></span>
+          <span class="text-xs font-bold text-slate-500 block sm:inline sm:ml-2">Interactive Quiz Website · Classes 1st to 10th</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2 bg-gradient-to-r from-amber-50 via-orange-50 to-indigo-50 border-2 border-amber-200/80 px-4 py-2 rounded-2xl shadow-xs">
+        <span class="text-xs font-extrabold text-slate-700">Made with 💖 by</span>
+        <span class="text-sm font-black bg-gradient-to-r from-amber-600 to-indigo-600 bg-clip-text text-transparent tracking-wide">Hacker Bhau</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- BOTTOM FEEDBACK DRAWER (Duolingo Style Slide-up) -->
+  <!-- ======================================================== -->
+  <div id="feedback-drawer" class="feedback-drawer">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex-1 space-y-1">
+        <div id="feedback-status-title">🎉 Shabash! Correct!</div>
+        <div id="feedback-explanation">
+          <!-- Explanation injected dynamically -->
+        </div>
+      </div>
+      <button id="feedback-action-btn" class="btn-duo btn-duo-green text-lg w-full sm:w-auto min-w-[180px]">
+        Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MASCOT SELECTION MODAL -->
+  <!-- ======================================================== -->
+  <div id="mascot-modal" class="modal-overlay" onclick="if(event.target === this) window.app && window.app.closeModal('mascot-modal')">
+    <div class="modal-content text-center">
+      <h3 class="text-2xl font-black text-slate-800 mb-1">Pick Your Companion Mascot</h3>
+      <p class="text-slate-500 font-semibold text-xs mb-6">Each companion brings energy, wisdom, and cheers you on!</p>
+
+      <div id="mascot-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+        <!-- Injected dynamically by JS -->
+      </div>
+
+      <div class="mt-6">
+        <button onclick="window.app && window.app.closeModal('mascot-modal')" class="btn-duo btn-duo-outline w-full text-sm">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/mascots.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
