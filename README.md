@@ -6,22 +6,6 @@
 
 ---
 
-## 🚀 Quick Start (Zero Dependencies)
-
-You can run EduHex in two ways:
-
-### Method 1: Using the Python Server (Recommended)
-Open a terminal in this directory and run:
-```bash
-python server.py
-```
-This will automatically launch your default web browser and open `http://localhost:8080`.
-
-### Method 2: Direct File Open
-Simply double-click `index.html` in your file explorer to open it in any modern browser (Chrome, Edge, Firefox, Safari).
-
----
-
 ## 🎮 Key Features
 
 ### 1. 🐅 Duolingo-Style Animated Avatars & Mascots
